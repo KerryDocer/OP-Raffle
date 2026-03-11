@@ -1,0 +1,11 @@
+node_modules/
+frontend/.next/
+frontend/out/
+.env*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+dist/
+.claude/

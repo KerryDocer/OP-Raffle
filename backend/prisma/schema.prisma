@@ -1,0 +1,58 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String        @id @default(cuid())
+    walletAddress String        @unique
+    twitter       String?
+    discord       String?
+    createdAt     DateTime      @default(now())
+    raffles       Raffle[]      @relation("CreatedRaffles")
+    participations Participant[]
+    wins          Winner[]
+}
+
+model Raffle {
+    id              String        @id @default(cuid())
+    title           String
+    description     String
+    prize           String
+    template        String        @default("token_airdrop")
+    winnersCount    Int           @default(1)
+    endDate         DateTime
+    createdBy       String
+    creator         User          @relation("CreatedRaffles", fields: [createdBy], references: [id])
+    participantsCount Int         @default(0)
+    status          String        @default("active")
+    image           String?
+    projectName     String?
+    projectIcon     String?
+    createdAt       DateTime      @default(now())
+    participants    Participant[]
+    winners         Winner[]
+}
+
+model Participant {
+    id       String   @id @default(cuid())
+    userId   String
+    user     User     @relation(fields: [userId], references: [id])
+    raffleId String
+    raffle   Raffle   @relation(fields: [raffleId], references: [id])
+    joinedAt DateTime @default(now())
+
+    @@unique([userId, raffleId])
+}
+
+model Winner {
+    id       String @id @default(cuid())
+    raffleId String
+    raffle   Raffle @relation(fields: [raffleId], references: [id])
+    userId   String
+    user     User   @relation(fields: [userId], references: [id])
+}
